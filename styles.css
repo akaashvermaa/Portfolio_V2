@@ -1,0 +1,804 @@
+:root {
+  --bg: #000000;
+  --panel: #0a0a0a;
+  --line: #262626;
+  --text: #f5f5f5;
+  --text-soft: #c8c8c8;
+  --text-faint: #8a8a8a;
+  --font: "Poppins", sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+dl,
+dd {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 4px;
+}
+
+/* Film grain over the whole page: flat colour only, no gradients. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-size: 200px 200px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ---------- Navigation ---------- */
+
+/* Difference blend keeps links readable over the photo, flat colour and panels. */
+.top-links,
+.site-nav {
+  position: fixed;
+  z-index: 50;
+  color: #fff;
+  mix-blend-mode: difference;
+  font-size: 0.875rem;
+}
+
+.top-links {
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.top-links a,
+.site-nav a,
+.menu-btn {
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.menu-btn:hover {
+  opacity: 0.6;
+}
+
+/* Links draw a thin underline from the left on hover; the current section keeps it. */
+.top-links a {
+  position: relative;
+}
+
+.top-links a::after,
+.site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.top-links a:hover::after,
+.site-nav a:hover::after,
+.site-nav a[aria-current="true"]::after {
+  transform: scaleX(1);
+}
+
+.site-nav {
+  top: 0;
+  left: 0;
+  padding: 1.5rem;
+}
+
+.menu-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  opacity: 0;
+  transform: translateY(-1rem);
+  visibility: hidden;
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0.3s;
+}
+
+.site-nav.open ul {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+.site-nav a {
+  position: relative;
+  display: inline-block;
+  padding: 0.25rem 0;
+}
+
+.site-nav a::after {
+  bottom: 0;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 560px;
+  height: 100dvh;
+  padding: 0 1rem 3rem;
+  overflow: hidden;
+}
+
+/* Portrait: assets/hero.jpg. If it is missing, the hero falls back to flat black. */
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg);
+  background-image: url("assets/hero.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1);
+  /* Opens like a print frame from the left; the name follows. */
+  animation: unmask 0.9s var(--ease-out) both;
+}
+
+@keyframes unmask {
+  from {
+    clip-path: inset(0 0 0 30%);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+
+/* Flat scrim so the name stays legible on a photo. */
+.hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 80rem;
+}
+
+.name {
+  margin-left: -1px;
+  font-weight: 600;
+  font-size: clamp(3.75rem, 16vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+/* Each line is a mask; the word rises into it once on load. */
+.name .line {
+  display: block;
+  overflow: hidden;
+  padding-top: 0.06em;
+  margin-top: -0.06em;
+}
+
+/* Big capitals carry side spacing that makes them look indented next to small text.
+   Pull each line left by its first letter's spacing so every edge on the hero lines up. */
+.name .line:first-child {
+  margin-left: -0.028em;
+}
+
+.name .line:last-child {
+  margin-left: -0.014em;
+}
+
+/* Hero entrance, one composition of about 1.3s: the portrait opens (0s), the name
+   rises into its masks as it does (0.15s), the taglines drift up (0.5s) and the
+   strip fades in last (0.8s). Fill mode "both" holds each start state from the
+   first frame, so nothing flashes before its animation begins. */
+.name .line > span {
+  display: block;
+  animation: rise 0.9s var(--ease-out) 0.15s both;
+}
+
+.name .line:nth-child(2) > span {
+  animation-delay: 0.21s;
+}
+
+.intro {
+  margin-top: 1.25rem;
+  color: var(--text);
+  font-size: clamp(1.25rem, 2.1vw, 2rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  animation: drift 0.6s var(--ease-out) 0.5s both;
+}
+
+.intro.intro-quote {
+  animation-delay: 0.56s;
+}
+
+/* The statement leads; the quote under it is smaller and lighter. */
+.intro-lead {
+  font-weight: 500;
+}
+
+.intro.intro-quote {
+  margin-top: 0.75rem;
+  color: var(--text-soft);
+  font-size: clamp(1rem, 1.4vw, 1.375rem);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* Plain facts along the bottom edge; hidden on phones where space is tight. */
+.hero-facts {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 1.5rem 3rem 2rem;
+  border-top: 1px solid var(--line);
+  animation: fade 0.5s ease-out 0.8s both;
+}
+
+.hero-facts dt {
+  color: var(--text-faint);
+  font-size: 0.875rem;
+}
+
+.hero-facts dd {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes drift {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding: 6rem 1.5rem;
+}
+
+.section-panel {
+  background: var(--panel);
+}
+
+.wrap {
+  max-width: 80rem;
+}
+
+/* The name in the hero is the loudest thing on the page; section titles stay a step below it. */
+.title {
+  margin-bottom: 3rem;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+/* About */
+
+.split {
+  display: grid;
+  gap: 1rem;
+}
+
+.split-title {
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+  font-size: clamp(2.5rem, 4.6vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* The opening sentence carries the section; the rest reads as quieter ruled notes. */
+.about-lead {
+  max-width: 30em;
+  margin-bottom: 3.5rem;
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.split-row {
+  display: grid;
+  gap: 0.75rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.split-row:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.split-row h3 {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.split-row .split-techs {
+  margin-bottom: 0.5rem;
+  color: var(--text);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.split-row p {
+  max-width: 34rem;
+  color: var(--text-soft);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.stack-note {
+  margin-top: 1.5rem;
+  color: var(--text-faint);
+  font-size: 0.9375rem;
+}
+
+/* Journey: the year sits where the other rows have their label. */
+
+.split-row p.journey-year {
+  color: var(--text);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.split-row .journey-title {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* A thin line down the left of the milestones; each segment draws as its row comes in. */
+.journey-rows .split-row {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.journey-rows .split-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: var(--text-faint);
+  transform-origin: top;
+}
+
+.split-row .journey-title ~ p + p {
+  margin-top: 1rem;
+}
+
+/* Ruled rows: projects */
+
+.row {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--line);
+  transition: background-color 0.3s;
+}
+
+.row-end {
+  border-top: 1px solid var(--line);
+}
+
+.row-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.375rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.row-sub {
+  color: var(--text-faint);
+  font-size: 1.0625rem;
+}
+
+.row-meta {
+  color: var(--text-faint);
+  font-size: 0.9375rem;
+}
+
+.row-body > p {
+  max-width: 34rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-faint);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.row-body > p:last-child {
+  margin-bottom: 0;
+}
+
+/* The title link stretches over the whole row so the row is one click target. */
+/* A faint underline marks linked titles; it brightens on hover. */
+.row-link {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.3s;
+}
+
+.row-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.row-link:focus-visible {
+  outline: none;
+}
+
+.row-link:focus-visible::after {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+}
+
+.project:has(.row-link):hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.project:hover .row-link {
+  text-decoration-color: currentColor;
+}
+
+/* The main product reads a step louder than the side projects. */
+.project-main .row-title {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  font-weight: 500;
+}
+
+.project-main .row-meta,
+.project-main .row-body > p {
+  color: var(--text-soft);
+}
+
+.project-main .tags li {
+  border-color: var(--text-faint);
+  color: var(--text-soft);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tags li {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-faint);
+  font-size: 0.8125rem;
+  transition: border-color 0.3s;
+}
+
+.project:hover .tags li {
+  border-color: var(--text-faint);
+}
+
+/* Contact: same ruled rows as About and Stack; each whole row is the link. */
+
+.contact-note {
+  max-width: 34rem;
+  margin: -2rem 0 3rem;
+  color: var(--text-soft);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.contact-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.contact-link:focus-visible {
+  outline-offset: 4px;
+}
+
+.contact-label {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.contact-value {
+  color: var(--text-soft);
+  font-size: 1.25rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition:
+    color 0.3s,
+    text-decoration-color 0.3s;
+}
+
+.contact-link:hover .contact-value {
+  color: var(--text);
+  text-decoration-color: currentColor;
+}
+
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+  color: var(--text-faint);
+  font-size: 0.875rem;
+}
+
+/* ---------- Larger screens ---------- */
+
+@media (min-width: 768px) {
+  .top-links {
+    padding: 2.5rem;
+  }
+
+  /* Section links move to a vertical list on the right edge. */
+  .site-nav {
+    top: 50%;
+    right: 2.5rem;
+    left: auto;
+    padding: 0;
+    transform: translateY(-50%);
+  }
+
+  .menu-btn {
+    display: none;
+  }
+
+  .site-nav ul {
+    align-items: flex-end;
+    gap: 1rem;
+    margin-top: 0;
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+  }
+
+  /* Extra bottom padding lifts the centred name above the middle of the screen. */
+  .hero {
+    align-items: center;
+    padding: 0 3rem 8rem;
+  }
+
+  .name {
+    font-size: clamp(5rem, 10vw, 10rem);
+  }
+
+  .intro {
+    margin-top: 1.5rem;
+  }
+
+  .hero-facts {
+    display: grid;
+  }
+
+  .section {
+    padding: 8rem 3rem;
+  }
+
+  .site-footer {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    padding: 0 4rem 8rem;
+  }
+
+  .hero-facts {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  /* Heading on the left, held in view while the text on the right scrolls past. */
+  .split {
+    grid-template-columns: 4fr 8fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .split-title {
+    position: sticky;
+    top: 6rem;
+    margin-bottom: 0;
+  }
+  .split-row {
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+  }
+
+  /* Sections line up with the hero's left edge, and their rules run on to the same
+     right edge as the side links, the way the hero's bottom rule does. */
+  .section {
+    padding: 8rem 2.5rem 8rem 4rem;
+  }
+
+  .wrap {
+    max-width: none;
+  }
+
+  .row {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2rem;
+    padding: 4rem 0;
+  }
+
+  .row-main {
+    grid-column: span 5;
+  }
+
+  .row-meta {
+    grid-column: span 2;
+  }
+
+  .row-body {
+    grid-column: span 5;
+  }
+
+  .row-title {
+    font-size: 1.875rem;
+  }
+
+  /* The rules reach the right edge; the text inside stays clear of the side links. */
+  .row,
+  .split-row {
+    padding-right: 8rem;
+  }
+}
+
+/* On a tall phone screen only a narrow slice of the wide photo shows;
+   shift the crop right so it lands on the face instead of the empty left side. */
+@media (max-width: 767px) {
+  .hero-photo {
+    background-position: 90% center;
+  }
+}
+
+/* Scroll reveals. main.js adds .motion to <html> only when motion is allowed,
+   so without JavaScript or with reduced motion everything is simply visible. */
+.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition:
+    opacity 0.5s var(--ease-out) var(--reveal-delay, 0s),
+    transform 0.5s var(--ease-out) var(--reveal-delay, 0s),
+    background-color 0.3s;
+}
+
+.motion [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.motion .journey-rows .split-row::before {
+  transform: scaleY(0);
+  transition: transform 0.5s var(--ease-out) 0.1s;
+}
+
+.motion .journey-rows .split-row.is-in::before {
+  transform: scaleY(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-photo {
+    animation: none;
+  }
+
+  .top-links a::after,
+  .site-nav a::after {
+    transition: none;
+  }
+
+  .name .line > span,
+  .intro,
+  .hero-facts {
+    animation: none;
+  }
+}

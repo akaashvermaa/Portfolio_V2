@@ -1,0 +1,22 @@
+# Vercel CLI
+.vercel
+
+# Local secrets, if ever added
+.env
+.env.*
+
+# Dependencies and logs, if a tool is ever added
+node_modules/
+*.log
+
+# Archives and design source files
+*.zip
+*.psd
+*.fig
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
